@@ -50,7 +50,20 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            setError(err.message);
+            const code = err?.code || "";
+            const msg = (err?.message || "").toLowerCase();
+            
+            if (code === "invalid_credentials" || msg.includes("invalid") || msg.includes("credential")) {
+                setError("Invalid login credentials.");
+            } else if (code === "email_not_confirmed" || msg.includes("confirm")) {
+                setError("Please confirm your email address first.");
+            } else if (code === "user_already_exists" || msg.includes("already registered") || msg.includes("already exist")) {
+                setError("This user is already registered.");
+            } else if (code === "weak_password" || msg.includes("weak") || msg.includes("password")) {
+                setError("Your password is too weak.");
+            } else {
+                setError("Authentication failed. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
