@@ -14,20 +14,26 @@ export default function Dashboard() {
   const [result, setResult] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<string>("General");
 
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth();
   
   useEffect(() => {
+    // 1. Kick out unauthorized users securely
+    if (!authLoading && !user) {
+       router.replace("/login");
+       return;
+    }
+
+    // 2. Hydrate Profile and Scan Results
     const storedResult = localStorage.getItem('nutrivision_result');
     const storedProfile = localStorage.getItem('nutrivision_profile');
     if (storedResult) {
       setResult(JSON.parse(storedResult));
     }
-    // Removed router.push("/") since this is now a permanent dashboard Hub
     
     if (storedProfile) {
       setUserProfile(storedProfile);
     }
-  }, [router]);
+  }, [user, authLoading, router]);
 
   const handleLogout = async () => {
       await signOut();

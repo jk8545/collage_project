@@ -31,6 +31,8 @@ export default function Home() {
     if (!authLoading && !user) {
       router.replace("/login");
     }
+    // Always clear memory cache when returning to the Scanner to prep for a New Scan
+    localStorage.removeItem('nutrivision_result');
   }, [user, authLoading, router]);
 
   if (authLoading || !user) {
