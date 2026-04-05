@@ -117,7 +117,7 @@ export default function Home() {
             nutrition_json: mergedResult,
             additives_json: mergedResult.detected_additives || [],
             health_score: mergedResult.health_score || 50,
-            personalized_score: userProfile !== 'General',
+            personalized_score: mergedResult.health_score || 50,
          });
          if (dbErr) console.log('History insert failed quietly:', dbErr);
       }
