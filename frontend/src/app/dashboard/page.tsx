@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import HealthGauge from "@/components/HealthGauge";
 import RadarChart from "@/components/RadarChart";
 import AdditiveCard from "@/components/AdditiveCard";
-import { ShieldAlert, CheckCircle, ArrowLeft, Info, AlertOctagon } from "lucide-react";
+import { ShieldAlert, CheckCircle, ArrowLeft, Info, AlertOctagon, Activity } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
