@@ -11,7 +11,8 @@ def parse_image_to_json(base64_image: str) -> dict:
     1. Extract Nutrition Facts per 100g or serving.
     2. Extract the full Ingredients list.
     3. Identify any Additives, E-numbers, or INS codes (e.g., E211, INS 330).
-    4. You MUST return ONLY valid JSON matching this exact schema:
+    4. MUST TRANSLATE output to strictly English. No matter what original language is printed on the package, return the ingredients and additives in English.
+    5. You MUST return ONLY valid JSON matching this exact schema:
     {
       "protein_g": 0,
       "sugar_g": 0,
