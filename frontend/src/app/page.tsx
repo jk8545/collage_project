@@ -65,7 +65,9 @@ export default function Home() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Analysis failed");
 
-      setResult(data);
+      localStorage.setItem('nutrivision_result', JSON.stringify(data));
+      localStorage.setItem('nutrivision_profile', userProfile);
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
