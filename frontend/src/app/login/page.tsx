@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function LoginPage() {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -14,6 +15,13 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+        if (!authLoading && user) {
+            router.replace("/");
+        }
+    }, [user, authLoading, router]);
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,12 +40,20 @@ export default function LoginPage() {
 
         try {
             if (isSignUp) {
-                const { error } = await supabase.auth.signUp({
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                 });
                 if (error) throw error;
-                setMessage("Check your email for the confirmation link!");
+                
+                // Force logout if Supabase tries to auto-authenticate after registration
+                if (data.session) {
+                    await supabase.auth.signOut();
+                }
+
+                setMessage("Registration successful! Please authenticate to continue.");
+                setIsSignUp(false);
+                setPassword("");
             } else {
                 const { error, data } = await supabase.auth.signInWithPassword({
                     email,
