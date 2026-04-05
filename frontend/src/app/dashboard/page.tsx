@@ -51,7 +51,7 @@ export default function Dashboard() {
 
   // Format Nutri-Score Color
   let nutriColor = "bg-gray-500 text-white";
-  if (result.nutri_grade) {
+  if (result && result.nutri_grade) {
     const grade = result.nutri_grade.toUpperCase();
     if (grade === 'A') nutriColor = "bg-green-700 text-white";
     if (grade === 'B') nutriColor = "bg-[#4ade80] text-green-900";
@@ -63,7 +63,7 @@ export default function Dashboard() {
   // Format NOVA Color
   let novaColor = "bg-gray-500 text-white";
   let novaLabel = "Unknown";
-  if (result.nova_group) {
+  if (result && result.nova_group) {
     if (result.nova_group === 1) { novaColor = "bg-green-600 text-white"; novaLabel = "Unprocessed"; }
     if (result.nova_group === 2) { novaColor = "bg-yellow-400 text-yellow-900"; novaLabel = "Processed"; }
     if (result.nova_group === 3) { novaColor = "bg-orange-500 text-white"; novaLabel = "Ultra Mix"; }
