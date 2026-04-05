@@ -74,10 +74,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-6 md:p-12 font-sans">
+    <main className="min-h-screen bg-gray-950 text-white p-4 sm:p-6 md:p-12 font-sans overflow-x-hidden">
       < div className="max-w-5xl mx-auto">
-        < header className="mb-10 flex flex-col items-center text-center space-y-4 relative">
-          <div className="absolute right-0 top-0 flex items-center gap-4">
+        < header className="mb-6 md:mb-10 flex flex-col items-center text-center space-y-4 relative">
+          <div className="w-full flex justify-end items-center gap-4 md:absolute md:right-0 md:top-0">
             <Link href="/history" className="text-sm font-medium text-gray-400 hover:text-white transition-colors flex items-center">
               <Clock className="w-4 h-4 mr-1" />
               History
@@ -92,7 +92,7 @@ export default function Home() {
               </Link>
             )}
           </div>
-          < h1 className="text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 pt-8 sm:pt-0">
+          < h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 pt-2 md:pt-0">
             NutriVision AI
           </h1 >
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -148,9 +148,9 @@ export default function Home() {
                 </div >
               ) : result ? (
                 <div className="space-y-6 animate-fade-in-up">
-                  < h2 className="text-2xl font-bold flex items-center border-b border-gray-800 pb-4">
-                    Analysis Complete
-                    < span className="ml-auto text-sm font-normal text-gray-400 bg-gray-800 px-3 py-1 rounded-full">
+                  < h2 className="text-xl md:text-2xl font-bold flex flex-wrap gap-2 items-center justify-between border-b border-gray-800 pb-4">
+                    <span>Analysis Complete</span>
+                    < span className="text-xs md:text-sm font-normal text-gray-400 bg-gray-800 px-3 py-1 rounded-full">
                       Confidence: {(result.confidence_score * 100).toFixed(0)}%
                     </span >
                   </h2 >
