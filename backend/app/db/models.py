@@ -27,3 +27,11 @@ class NutritionData(BaseModel):
     fat_g: float = 0.0
     sodium_mg: float = 0.0
     calories: float = 0.0
+
+class ChatRequest(BaseModel):
+    message: str
+    history: List[dict] = []
+    context: Optional[dict] = None
+
+class ChatResponse(BaseModel):
+    reply: str

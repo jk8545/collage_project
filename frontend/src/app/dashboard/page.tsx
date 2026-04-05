@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import HealthGauge from "@/components/HealthGauge";
 import RadarChart from "@/components/RadarChart";
 import AdditiveCard from "@/components/AdditiveCard";
+import DuckChatbot from "@/components/DuckChatbot";
 import { ShieldAlert, CheckCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -102,6 +103,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      <DuckChatbot />
     </main>
   );
 }
