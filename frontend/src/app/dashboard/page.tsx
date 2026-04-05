@@ -104,7 +104,7 @@ export default function Dashboard() {
             <div className="flex flex-wrap gap-8 items-center">
               <HealthGauge score={result.health_score || 0} />
               
-              {result.nutri_grade && (
+              {result.nutri_grade && typeof result.nutri_grade === 'string' && result.nutri_grade.trim() !== '' && result.nutri_grade.toLowerCase() !== 'unknown' && (
                 <div className="flex flex-col justify-center items-center bg-nv-bg-800 p-6 rounded-2xl border border-nv-b1 h-32 w-32 shadow-inner">
                   <span className="text-sm text-nv-t3 font-medium mb-2 uppercase tracking-wide">Nutri-Score</span>
                   <div className={`text-4xl font-black rounded-lg px-4 py-1 uppercase ${nutriColor}`}>
@@ -113,7 +113,7 @@ export default function Dashboard() {
                 </div>
               )}
               
-              {result.nova_group && (
+              {[1, 2, 3, 4].includes(result.nova_group) && (
                 <div className="flex flex-col justify-center items-center bg-nv-bg-800 p-6 rounded-2xl border border-nv-b1 h-32 w-48 shadow-inner">
                   <span className="text-sm text-nv-t3 font-medium mb-2 uppercase tracking-wide">NOVA GROUP {result.nova_group}</span>
                   <div className={`text-sm font-bold rounded-full px-4 py-1.5 uppercase tracking-wider ${novaColor}`}>
