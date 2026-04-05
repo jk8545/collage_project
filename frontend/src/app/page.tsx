@@ -13,6 +13,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getApiUrl } from "@/lib/api-config";
+import { BrowserMultiFormatReader } from "@zxing/browser";
+import { fetchByBarcode, formatOffToNutrivision } from "@/lib/openfoodfacts";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -41,32 +43,65 @@ export default function Home() {
   const handleUploadSuccess = async (url: string) => {
     setLoading(true);
     setError("");
-    setLoadingText("Scanning for additives...");
+    setLoadingText("Scanning label & barcode simultaneously...");
 
     try {
-      setTimeout(() => setLoadingText("Checking FSSAI compliance..."), 1500);
-      setTimeout(() => setLoadingText("Personalizing health score..."), 3000);
+      const codeReader = new BrowserMultiFormatReader();
 
-      const response = await fetch(`${getApiUrl()}/analyze`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          image_url: url,
-          user_profile: userProfile,
-          metadata: {
-            device: "Web",
-            user_id: user?.id || null
-          }
+      const [ocrResult, barcodeResult] = await Promise.allSettled([
+        fetch(`${getApiUrl()}/analyze`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            image_url: url,
+            user_profile: userProfile,
+            metadata: {
+              device: "Web",
+              user_id: user?.id || null
+            }
+          }),
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "Analysis failed");
+          return data;
         }),
-      });
+        (async () => {
+          try {
+            const zxResult = await codeReader.decodeFromImageUrl(url);
+            if (zxResult && zxResult.getText()) {
+              const barcode = zxResult.getText();
+              const offData = await fetchByBarcode(barcode);
+              if (offData) {
+                return formatOffToNutrivision(offData, userProfile);
+              }
+            }
+          } catch (e) {
+            console.log("Barcode not found or fetch failed.");
+          }
+          return null;
+        })()
+      ]);
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Analysis failed");
+      let finalResult = null;
+      let finalSource = "ocr";
 
-      localStorage.setItem('nutrivision_result', JSON.stringify(data));
+      if (barcodeResult.status === 'fulfilled' && barcodeResult.value) {
+        finalResult = barcodeResult.value;
+        finalSource = "barcode";
+      } else if (ocrResult.status === 'fulfilled' && ocrResult.value) {
+        finalResult = ocrResult.value;
+        finalSource = "ocr";
+      } else {
+        const ocrErr = ocrResult.status === 'rejected' ? ocrResult.reason : new Error();
+        throw new Error(ocrErr.message || "Failed to analyze image with both engines.");
+      }
+
+      localStorage.setItem('nutrivision_result', JSON.stringify(finalResult));
       localStorage.setItem('nutrivision_profile', userProfile);
+      localStorage.setItem('nutrivision_source', finalSource);
+      
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);

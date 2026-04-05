@@ -12,10 +12,12 @@ export default function Dashboard() {
   const router = useRouter();
   const [result, setResult] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<string>("General");
+  const [source, setSource] = useState<string>("ocr");
 
   useEffect(() => {
     const storedResult = localStorage.getItem('nutrivision_result');
     const storedProfile = localStorage.getItem('nutrivision_profile');
+    const storedSource = localStorage.getItem('nutrivision_source');
     if (storedResult) {
       setResult(JSON.parse(storedResult));
     } else {
@@ -23,6 +25,9 @@ export default function Dashboard() {
     }
     if (storedProfile) {
       setUserProfile(storedProfile);
+    }
+    if (storedSource) {
+      setSource(storedSource);
     }
   }, [router]);
 
@@ -48,7 +53,18 @@ export default function Dashboard() {
           {/* Subtle background glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-nv-green/10 rounded-full blur-[80px] -z-10"></div>
           
-          <h2 className="text-3xl md:text-4xl font-syne font-extrabold tracking-tight mb-8 text-nv-green-light">Analysis Summary</h2>
+          <div className="flex justify-between items-center mb-8 relative z-10">
+            <h2 className="text-3xl md:text-4xl font-syne font-extrabold tracking-tight text-nv-green-light">Analysis Summary</h2>
+            {source === "barcode" ? (
+              <span className="inline-flex items-center px-3 py-1 bg-nv-green/20 border border-nv-green/40 text-nv-green-light font-dm rounded-full text-sm font-bold shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+                ⚡ Barcode Match
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-3 py-1 bg-blue-500/20 border border-blue-500/40 text-blue-400 font-dm rounded-full text-sm font-bold">
+                🔍 OCR Scan
+              </span>
+            )}
+          </div>
           
           <div className="flex flex-col md:flex-row gap-8 items-center mb-10">
             <HealthGauge score={result.health_score} />
