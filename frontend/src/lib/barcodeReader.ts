@@ -6,16 +6,27 @@ export async function readBarcodeFromFile(file: File): Promise<string | null> {
         
         return new Promise((resolve) => {
             const img = new Image();
-            img.onload = async () => {
-                try {
-                    const codeReader = new BrowserMultiFormatReader();
-                    const result = await codeReader.decodeFromImageElement(img);
-                    URL.revokeObjectURL(objectUrl);
-                    resolve(result.getText());
-                } catch (e) {
-                    URL.revokeObjectURL(objectUrl);
-                    resolve(null);
-                }
+            img.onload = () => {
+                // Yield to main thread so React UI can render "Analyzing..." loader
+                setTimeout(async () => {
+                    try {
+                        const codeReader = new BrowserMultiFormatReader();
+                        
+                        // Enforce a strict 3-second timeout on barcode extraction
+                        const timeoutPromise = new Promise<null>((res) => setTimeout(() => res(null), 3000));
+                        const decodePromise = codeReader.decodeFromImageElement(img)
+                            .then(res => res.getText())
+                            .catch(() => null);
+                            
+                        const result = await Promise.race([decodePromise, timeoutPromise]);
+                        
+                        URL.revokeObjectURL(objectUrl);
+                        resolve(result);
+                    } catch (e) {
+                        URL.revokeObjectURL(objectUrl);
+                        resolve(null);
+                    }
+                }, 100);
             };
             img.onerror = () => {
                 URL.revokeObjectURL(objectUrl);
