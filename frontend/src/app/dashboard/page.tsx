@@ -4,37 +4,43 @@ import React, { useEffect, useState } from "react";
 import HealthGauge from "@/components/HealthGauge";
 import RadarChart from "@/components/RadarChart";
 import AdditiveCard from "@/components/AdditiveCard";
-import { ShieldAlert, CheckCircle, ArrowLeft, Info, AlertOctagon, Activity } from "lucide-react";
+import { ShieldAlert, CheckCircle, ArrowLeft, Info, AlertOctagon, Activity, User as UserIcon, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 
 export default function Dashboard() {
   const router = useRouter();
   const [result, setResult] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<string>("General");
 
+  const { user, signOut } = useAuth();
+  
   useEffect(() => {
     const storedResult = localStorage.getItem('nutrivision_result');
     const storedProfile = localStorage.getItem('nutrivision_profile');
     if (storedResult) {
       setResult(JSON.parse(storedResult));
-    } else {
-      router.push("/");
     }
+    // Removed router.push("/") since this is now a permanent dashboard Hub
+    
     if (storedProfile) {
       setUserProfile(storedProfile);
     }
   }, [router]);
 
-  if (!result) return null;
+  const handleLogout = async () => {
+      await signOut();
+      router.push("/login");
+  };
 
-  const dataSources = result.data_sources || ["ocr"];
+  const dataSources = result?.data_sources || ["ocr"];
   const hasOffData = dataSources.includes("barcode");
   const hasOcrData = dataSources.includes("ocr");
 
   // Format Additives safely: combine OFF and OCR, deduplicate by code
   const combinedAdditives = Array.from(new Map(
-    [...(result.detected_additives || []), ...(result.off_additives_tags || [])].map(item => {
+    [...(result?.detected_additives || []), ...(result?.off_additives_tags || [])].map(item => {
       // normalize codes for deduplication
       const code = item.code || (typeof item === 'string' ? item : JSON.stringify(item));
       const formattedCode = code.replace(/^en:/i, '').toUpperCase();
@@ -61,14 +67,48 @@ export default function Dashboard() {
     if (result.nova_group === 1) { novaColor = "bg-green-600 text-white"; novaLabel = "Unprocessed"; }
     if (result.nova_group === 2) { novaColor = "bg-yellow-400 text-yellow-900"; novaLabel = "Processed"; }
     if (result.nova_group === 3) { novaColor = "bg-orange-500 text-white"; novaLabel = "Ultra Mix"; }
-    if (result.nova_group === 4) { novaColor = "bg-red-600 text-white"; novaLabel = "Ultra-Processed"; }
+    if (result?.nova_group === 4) { novaColor = "bg-red-600 text-white"; novaLabel = "Ultra-Processed"; }
   }
 
   return (
     <main className="min-h-screen bg-transparent text-nv-t1 p-4 sm:p-6 md:p-12 font-dm overflow-x-hidden">
       <div className="max-w-5xl mx-auto space-y-8 animate-fade-in-up">
         
-        <header className="flex flex-wrap gap-4 items-center justify-between border-b border-[rgba(34,197,94,0.15)] pb-6 mb-8 mt-4">
+        {/* NEW USER HUB HEADER */}
+        <div className="bg-[#0f1e0e] rounded-[16px] p-6 shadow-xl border border-[rgba(34,197,94,0.15)] flex flex-wrap justify-between items-center mt-4">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-nv-bg-700 border border-nv-green/30 flex items-center justify-center">
+                 <UserIcon className="w-6 h-6 text-nv-green-light" />
+              </div>
+              <div>
+                 <h2 className="text-xl font-syne font-bold text-nv-t1">Welcome to your Dashboard</h2>
+                 <p className="text-sm text-nv-t3 font-dm">{user?.email || "Guest User"} • {userProfile} Profile</p>
+              </div>
+           </div>
+           <div className="flex gap-3 mt-4 sm:mt-0">
+              <Link href="/" className="px-4 py-2 bg-nv-green/20 text-nv-green-light border border-nv-green/40 rounded-xl font-bold font-dm hover:bg-nv-green hover:text-nv-bg-900 transition-colors">
+                 New Scan
+              </Link>
+              {user && (
+                  <button onClick={handleLogout} className="px-4 py-2 bg-nv-bg-700 text-nv-red border border-nv-red/20 rounded-xl font-bold font-dm hover:bg-nv-red hover:text-white transition-colors flex items-center">
+                     <LogOut className="w-4 h-4 mr-2" /> Logout
+                  </button>
+              )}
+           </div>
+        </div>
+
+        {!result ? (
+            <div className="bg-[#0f1e0e] rounded-[16px] p-12 text-center border border-nv-b1">
+                <Activity className="w-16 h-16 text-nv-green/30 mx-auto mb-4" />
+                <h3 className="text-2xl font-syne font-bold text-nv-t1 mb-2">No Active Scan</h3>
+                <p className="text-nv-t3 font-dm mb-6">You haven't analyzed any products in this session yet.</p>
+                <Link href="/" className="inline-flex items-center justify-center py-3 px-6 rounded-xl bg-nv-green text-nv-bg-900 font-bold font-syne hover:bg-nv-neon transition-colors">
+                    Start a Scan
+                </Link>
+            </div>
+        ) : (
+          <>
+            <header className="flex flex-wrap gap-4 items-center justify-between border-b border-[rgba(34,197,94,0.15)] pb-6 mb-8 mt-4">
           <Link href="/" className="inline-flex items-center text-sm font-bold bg-nv-bg-700 hover:bg-nv-bg-600 text-nv-t1 py-2 px-4 rounded-[16px] transition-colors border border-nv-b1">
             <ArrowLeft className="w-4 h-4 mr-2 text-nv-green" />
             Back to Scanner
@@ -223,7 +263,10 @@ export default function Dashboard() {
             </div>
           )}
           
+          
         </div>
+        </>
+        )}
       </div>
     </main>
   );
