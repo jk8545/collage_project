@@ -47,9 +47,9 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
     };
 
     return (
-        <div className="flex flex-col md:flex-row gap-4 w-full">
+        <div className="flex flex-col md:flex-row gap-4 w-full relative">
             {/* Camera Option */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-600 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors cursor-pointer relative group">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 border-2 border-dashed border-[rgba(34,197,94,0.35)] rounded-xl bg-[#0f1e0e] hover:border-[rgba(34,197,94,0.6)] hover:bg-[#162615] transition-all cursor-pointer relative group">
                 <input
                     type="file"
                     accept="image/*"
@@ -59,15 +59,16 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
                     disabled={isUploading}
                     aria-label="Take Photo"
                 />
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+                <div className="w-14 h-14 rounded-full bg-nv-green/10 border border-nv-green/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-nv-green-light transition-transform relative">
+                    <div className="absolute inset-0 rounded-full border border-nv-green animate-ping opacity-25"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-nv-green"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
                 </div>
                 <p className="text-gray-300 font-medium text-center">Use Camera</p>
                 <p className="text-xs text-gray-500 mt-1 text-center">Take a live photo</p>
             </div>
 
             {/* Gallery Option */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-600 rounded-xl bg-gray-800/50 hover:bg-gray-800 transition-colors cursor-pointer relative group">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 border-2 border-dashed border-[rgba(34,197,94,0.35)] rounded-xl bg-[#0f1e0e] hover:border-[rgba(34,197,94,0.6)] hover:bg-[#162615] transition-all cursor-pointer relative group">
                 <input
                     type="file"
                     accept="image/*"
@@ -76,8 +77,9 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
                     disabled={isUploading}
                     aria-label="Upload Image"
                 />
-                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <UploadCloud className="w-6 h-6 text-purple-400" />
+                <div className="w-14 h-14 rounded-full bg-nv-green/10 border border-nv-green/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-nv-green-light transition-transform relative">
+                    <div className="absolute inset-0 rounded-full border border-nv-green animate-ping opacity-25"></div>
+                    <UploadCloud className="w-6 h-6 text-nv-green" />
                 </div>
                 <p className="text-gray-300 font-medium text-center">Upload Image</p>
                 <p className="text-xs text-gray-500 mt-1 text-center">Choose from gallery</p>
@@ -85,10 +87,10 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
 
             {/* Absolute loading overlay if needed */}
             {isUploading && (
-                <div className="absolute inset-0 bg-gray-900/80 rounded-xl flex items-center justify-center z-20 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-nv-bg-900/80 rounded-xl flex items-center justify-center z-20 backdrop-blur-sm">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p className="text-blue-400 font-medium text-sm">Uploading securely...</p>
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-nv-green mx-auto mb-2"></div>
+                        <p className="text-nv-green-light font-medium text-sm">Uploading securely...</p>
                     </div>
                 </div>
             )}

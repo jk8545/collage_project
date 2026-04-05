@@ -57,15 +57,15 @@ export default function HistoryPage() {
     }, [user, authLoading]);
 
     return (
-        <main className="min-h-screen bg-gray-950 text-white p-6 md:p-12 font-sans">
+        <main className="min-h-screen bg-transparent text-nv-t1 p-6 md:p-12 font-dm">
             <div className="max-w-5xl mx-auto">
                 <header className="mb-10 flex items-center gap-4">
                     <Link href="/">
-                        <button className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors">
-                            <ArrowLeft className="w-6 h-6" />
+                        <button className="p-2 bg-nv-bg-700 rounded-full hover:bg-nv-bg-600 transition-colors border border-nv-b1">
+                            <ArrowLeft className="w-6 h-6 text-nv-green" />
                         </button>
                     </Link>
-                    <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
+                    <h1 className="text-4xl font-syne font-extrabold tracking-[-0.02em] text-nv-t1">
                         Scan History
                     </h1>
                 </header>
@@ -83,41 +83,49 @@ export default function HistoryPage() {
                         </Link>
                     </div>
                 ) : history.length === 0 ? (
-                    <div className="text-center py-20 text-gray-500">
-                        <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p>No scans found. Upload a label to get started!</p>
+                    <div className="text-center py-20 text-nv-t3">
+                        <Clock className="w-16 h-16 mx-auto mb-4 opacity-50 text-nv-green" />
+                        <p className="font-dm">No scans found. Upload a label to get started!</p>
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {history.map((scan) => (
-                            <div key={scan.id} className="bg-gray-900 rounded-2xl p-5 border border-gray-800 shadow-xl flex flex-col group hover:border-blue-500/50 transition-colors">
+                        {history.map((scan) => {
+                            let badgeClass = "bg-nv-green/20 text-nv-green-light border border-nv-green/30";
+                            if (scan.health_score < 40) badgeClass = "bg-[#f87171]/20 text-[#f87171] border-red-500/30";
+                            else if (scan.health_score <= 70) badgeClass = "bg-[#fbbf24]/20 text-[#fbbf24] border-yellow-500/30";
+
+                            return (
+                            <div key={scan.id} className="bg-[#0f1e0e] rounded-[14px] p-5 border border-[rgba(34,197,94,0.15)] shadow-xl flex flex-col group hover:border-[rgba(34,197,94,0.3)] hover:brightness-110 transition-all">
                                 <div className="flex justify-between items-start mb-4">
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-[#86efac] font-dm">
                                         {new Date(scan.timestamp || Date.now()).toLocaleDateString()}
                                     </span>
-                                    <span className="text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400 font-medium">
+                                    <span className="text-xs px-2 py-1 rounded-full bg-nv-bg-600 text-nv-t2 border border-nv-b1 font-medium font-syne tracking-wide">
                                         {scan.personalized_score ? "Personalized" : "General"}
+                                    </span>
+                                    <span className={`text-xs px-2 py-1 rounded-full font-bold font-syne ${badgeClass} inline-block ml-2`}>
+                                        {scan.health_score}/100
                                     </span>
                                 </div>
 
                                 <div className="flex gap-4 items-center mb-6">
                                     {scan.image_url ? (
-                                        <img src={scan.image_url} alt="Scanned label" className="w-20 h-20 rounded-lg object-cover border border-gray-700" />
+                                        <img src={scan.image_url} alt="Scanned label" className="w-20 h-20 rounded-lg object-cover border border-[rgba(34,197,94,0.2)]" />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center">
-                                            <span className="text-gray-500 text-xs">No img</span>
+                                        <div className="w-20 h-20 rounded-lg bg-nv-bg-800 border border-nv-b1 flex items-center justify-center">
+                                            <span className="text-nv-green-light/50 text-xs font-syne">No img</span>
                                         </div>
                                     )}
-                                    <div className="transform scale-75 origin-left">
+                                    <div className="scale-[0.6] origin-left -ml-4 flex-1">
                                         <HealthGauge score={scan.health_score || 0} />
                                     </div>
                                 </div>
 
                                 <div className="mt-auto space-y-2">
-                                    <p className="text-sm font-medium text-gray-300">Target Adds: {scan.additives_json?.length || 0}</p>
+                                    <p className="text-sm font-medium text-nv-t2">Target Adds: <span className="text-nv-green-light">{scan.additives_json?.length || 0}</span></p>
                                 </div>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 )}
             </div>

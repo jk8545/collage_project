@@ -57,20 +57,20 @@ export default function DuckChatbot() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {isOpen && (
-        <div className="mb-4 w-72 sm:w-80 h-96 bg-gray-900 border border-teal-500/50 shadow-[0_0_15px_rgba(20,184,166,0.3)] rounded-2xl flex flex-col overflow-hidden animate-fade-in-up">
-          <div className="bg-gray-800 border-b border-teal-500/30 p-3 flex justify-between items-center">
-            <h3 className="font-bold text-teal-400 flex items-center gap-2">
+        <div className="mb-4 w-72 sm:w-80 h-96 bg-nv-bg-800 border border-[rgba(34,197,94,0.25)] shadow-[0_0_15px_rgba(34,197,94,0.15)] rounded-[20px] flex flex-col overflow-hidden animate-fade-in-up font-dm text-nv-t1">
+          <div className="bg-nv-bg-700 border-b border-[rgba(34,197,94,0.25)] p-3 flex justify-between items-center">
+            <h3 className="font-bold text-nv-green flex items-center gap-2 font-syne text-lg">
                NutriDuck
             </h3>
-            <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+            <button onClick={() => setIsOpen(false)} className="text-nv-t3 hover:text-nv-neon text-xl leading-none">&times;</button>
           </div>
           
           <div className="flex-1 p-3 overflow-y-auto space-y-3">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`p-2 px-3 rounded-xl max-w-[85%] text-sm ${
-                  m.role === 'user' ? 'bg-teal-600/20 border border-teal-500/30 text-teal-100 rounded-tr-sm' 
-                  : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-tl-sm'
+                <div className={`p-2 px-3 rounded-xl max-w-[85%] text-sm font-medium ${
+                  m.role === 'user' ? 'bg-nv-green text-nv-bg-900 rounded-tr-sm shadow-md shadow-nv-green/10' 
+                  : 'bg-nv-bg-600 border border-nv-b1 text-nv-t2 rounded-tl-sm shadow-inner'
                 }`}>
                   {m.content}
                 </div>
@@ -78,29 +78,29 @@ export default function DuckChatbot() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-gray-800 border border-gray-700 p-2 px-3 rounded-xl rounded-tl-sm flex gap-1">
-                  <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                  <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                  <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"></div>
+                <div className="bg-nv-bg-600 border border-nv-b1 p-2 px-3 rounded-xl rounded-tl-sm flex gap-1 shadow-inner">
+                  <div className="w-2 h-2 bg-nv-green-light rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-2 h-2 bg-nv-green-light rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-2 h-2 bg-nv-green-light rounded-full animate-bounce"></div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-3 bg-gray-800 border-t border-teal-500/30 flex gap-2">
+          <div className="p-3 bg-nv-bg-800 border-t border-[rgba(34,197,94,0.25)] flex gap-2">
             <input 
               type="text" 
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder="Ask me anything..." 
-              className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-teal-400"
+              className="flex-1 bg-nv-bg-700 border border-nv-b2 rounded-lg px-3 py-1.5 text-sm text-nv-t1 focus:outline-none focus:border-nv-green transition-colors"
             />
             <button 
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className="bg-teal-500/20 text-teal-400 border border-teal-500/50 rounded-lg px-3 hover:bg-teal-500/40 transition-colors disabled:opacity-50"
+              className="bg-nv-green text-nv-bg-900 font-syne font-bold border border-nv-green-light rounded-lg px-4 hover:bg-nv-neon transition-colors disabled:opacity-50"
             >
               Send
             </button>
@@ -110,7 +110,7 @@ export default function DuckChatbot() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-gray-900 border-2 border-teal-400 hover:border-pink-500 text-3xl rounded-full shadow-[0_0_20px_rgba(20,184,166,0.6)] flex items-center justify-center hover:scale-110 transition-transform focus:outline-none"
+        className="w-14 h-14 bg-nv-green border-2 border-[rgba(34,197,94,0.15)] hover:border-nv-neon text-3xl rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] flex items-center justify-center hover:scale-110 transition-all focus:outline-none"
       >
         🦆
       </button>
