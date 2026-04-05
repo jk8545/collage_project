@@ -108,6 +108,27 @@ export default function HistoryPage() {
                                     </span>
                                 </div>
 
+                                {/* Dynamic Product Identity row if available from Merged Backend/Frontend logic */}
+                                {scan.nutrition_json?.product_name && (
+                                    <div className="mb-3 truncate">
+                                        <h3 className="font-syne font-bold text-nv-t1 text-lg truncate" title={scan.nutrition_json.product_name}>
+                                            {scan.nutrition_json.product_name}
+                                        </h3>
+                                        <div className="flex gap-2 mt-1">
+                                            {scan.nutrition_json.data_sources?.includes("barcode") && (
+                                                <span className="text-[10px] bg-nv-green/20 text-nv-green-light px-2 rounded-full font-bold uppercase border border-nv-green/30">
+                                                    ⚡ Barcode
+                                                </span>
+                                            )}
+                                            {scan.nutrition_json.data_sources?.includes("ocr") && (
+                                                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 rounded-full font-bold uppercase border border-blue-500/30">
+                                                    🔍 OCR
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="flex gap-4 items-center mb-6">
                                     {scan.image_url ? (
                                         <img src={scan.image_url} alt="Scanned label" className="w-20 h-20 rounded-lg object-cover border border-[rgba(34,197,94,0.2)]" />

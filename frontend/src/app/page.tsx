@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { getApiUrl } from "@/lib/api-config";
 import { readBarcodeFromFile } from "@/lib/barcodeReader";
 import { fetchByBarcode } from "@/lib/openfoodfacts";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -99,6 +100,24 @@ export default function Home() {
         mergedResult.off_ingredients_text = offData.ingredients_text;
         mergedResult.official_nutriments = offData.nutriments;
         mergedResult.off_additives_tags = offData.additives || [];
+      }
+
+      // Automatically set deterministic Confidence Score to 100% for pristine barcode scans
+      if (offData && !mergedResult.confidence_score) {
+         mergedResult.confidence_score = 1.0;
+      }
+
+      // Save History directly from the frontend securely to include all sources
+      if (user && process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://mock.supabase.co') {
+         const { error: dbErr } = await supabase.from("scan_history").insert({
+            user_id: user.id,
+            image_url: url,
+            nutrition_json: mergedResult,
+            additives_json: mergedResult.detected_additives || [],
+            health_score: mergedResult.health_score || 50,
+            personalized_score: userProfile !== 'General',
+         });
+         if (dbErr) console.log('History insert failed quietly:', dbErr);
       }
 
       localStorage.setItem('nutrivision_result', JSON.stringify(mergedResult));

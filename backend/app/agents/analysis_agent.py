@@ -21,20 +21,8 @@ def analyze_product(image_url: str, user_profile: str, metadata: Dict = None) ->
     insight = generate_personalization(structured, user_profile)
     health_score = calculate_health_score(structured, user_profile)
     
-    # 6. Save to Supabase (History)
-    if supabase_client:
-        try:
-            supabase_client.table('scan_history').insert({
-                'image_url': image_url,
-                'nutrition_json': structured,
-                'additives_json': final_additives,
-                'health_score': health_score,
-                'personalized_score': health_score, # Can be nuanced later
-                # 'user_id': metadata.get('user_id') if metadata else None
-            }).execute()
-        except Exception as e:
-            print(f"DB Insert failed: {e}")
-            
+    # 6. Save to Supabase (Moved to Frontend to capture Barcode Merges securely)
+    # The frontend now natively pushes the completed JSON cluster directly.
     # Assemble response
     additives_list = [Additive(code=a.get('code',''), risk=a.get('risk',''), note=a.get('note','')) for a in final_additives]
     
