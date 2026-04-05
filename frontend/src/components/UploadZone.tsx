@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { UploadCloud } from "lucide-react";
 
 interface UploadZoneProps {
-    onUploadSuccess: (url: string) => void;
+    onUploadSuccess: (url: string, file: File) => void;
     onError: (msg: string) => void;
 }
 
@@ -20,7 +20,7 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
         // Fallback for when Supabase is not configured
         if (process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://mock.supabase.co' || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
             setTimeout(() => {
-                onUploadSuccess(URL.createObjectURL(file));
+                onUploadSuccess(URL.createObjectURL(file), file);
                 setIsUploading(false);
             }, 1000);
             return;
@@ -38,7 +38,7 @@ export default function UploadZone({ onUploadSuccess, onError }: UploadZoneProps
                 .from("food-labels")
                 .getPublicUrl(fileName);
 
-            onUploadSuccess(urlData.publicUrl);
+            onUploadSuccess(urlData.publicUrl, file);
         } catch (err: any) {
             onError(err.message || "Upload failed");
         } finally {

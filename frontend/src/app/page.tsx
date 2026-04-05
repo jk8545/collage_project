@@ -13,8 +13,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { getApiUrl } from "@/lib/api-config";
-import { BrowserMultiFormatReader } from "@zxing/browser";
-import { fetchByBarcode, formatOffToNutrivision } from "@/lib/openfoodfacts";
+import { readBarcodeFromFile } from "@/lib/barcodeReader";
+import { fetchByBarcode } from "@/lib/openfoodfacts";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -40,15 +40,13 @@ export default function Home() {
     );
   }
 
-  const handleUploadSuccess = async (url: string) => {
+  const handleUploadSuccess = async (url: string, file: File) => {
     setLoading(true);
     setError("");
-    setLoadingText("Scanning label & barcode simultaneously...");
+    setLoadingText("Analyzing label + scanning barcode...");
 
     try {
-      const codeReader = new BrowserMultiFormatReader();
-
-      const [ocrResult, barcodeResult] = await Promise.allSettled([
+      const [ocrResult, barcodeStringResult] = await Promise.allSettled([
         fetch(`${getApiUrl()}/analyze`, {
           method: "POST",
           headers: {
@@ -67,40 +65,44 @@ export default function Home() {
           if (!res.ok) throw new Error(data.detail || "Analysis failed");
           return data;
         }),
-        (async () => {
-          try {
-            const zxResult = await codeReader.decodeFromImageUrl(url);
-            if (zxResult && zxResult.getText()) {
-              const barcode = zxResult.getText();
-              const offData = await fetchByBarcode(barcode);
-              if (offData) {
-                return formatOffToNutrivision(offData, userProfile);
-              }
-            }
-          } catch (e) {
-            console.log("Barcode not found or fetch failed.");
-          }
-          return null;
-        })()
+        readBarcodeFromFile(file)
       ]);
 
-      let finalResult = null;
-      let finalSource = "ocr";
-
-      if (barcodeResult.status === 'fulfilled' && barcodeResult.value) {
-        finalResult = barcodeResult.value;
-        finalSource = "barcode";
-      } else if (ocrResult.status === 'fulfilled' && ocrResult.value) {
-        finalResult = ocrResult.value;
-        finalSource = "ocr";
-      } else {
-        const ocrErr = ocrResult.status === 'rejected' ? ocrResult.reason : new Error();
-        throw new Error(ocrErr.message || "Failed to analyze image with both engines.");
+      let offData = null;
+      if (barcodeStringResult.status === 'fulfilled' && barcodeStringResult.value) {
+        offData = await fetchByBarcode(barcodeStringResult.value);
       }
 
-      localStorage.setItem('nutrivision_result', JSON.stringify(finalResult));
+      const ocrSuccess = ocrResult.status === 'fulfilled' && !!ocrResult.value;
+      const offSuccess = !!offData;
+
+      if (!ocrSuccess && !offSuccess) {
+        throw new Error("Could not analyze this image, please try a clearer photo");
+      }
+
+      const dataSources = [];
+      if (ocrSuccess) dataSources.push("ocr");
+      if (offSuccess) dataSources.push("barcode");
+
+      const mergedResult = {
+        ...(ocrSuccess ? ocrResult.value : {}),
+        data_sources: dataSources,
+      };
+
+      if (offData) {
+        mergedResult.product_name = offData.product_name || mergedResult.product_name;
+        mergedResult.brand = offData.brand;
+        mergedResult.quantity = offData.quantity;
+        mergedResult.nutri_grade = offData.nutri_grade;
+        mergedResult.nova_group = offData.nova_group;
+        mergedResult.allergens = offData.allergens;
+        mergedResult.off_ingredients_text = offData.ingredients_text;
+        mergedResult.official_nutriments = offData.nutriments;
+        mergedResult.off_additives_tags = offData.additives || [];
+      }
+
+      localStorage.setItem('nutrivision_result', JSON.stringify(mergedResult));
       localStorage.setItem('nutrivision_profile', userProfile);
-      localStorage.setItem('nutrivision_source', finalSource);
       
       router.push('/dashboard');
     } catch (err: any) {
