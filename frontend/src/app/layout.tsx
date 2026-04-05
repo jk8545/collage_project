@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import DuckChatbot from '@/components/DuckChatbot';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
+          <DuckChatbot />
         </AuthProvider>
       </body>
     </html>
