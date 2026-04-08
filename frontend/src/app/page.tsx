@@ -2,10 +2,7 @@
 
 import React, { useState } from "react";
 import UploadZone from "@/components/UploadZone";
-import HealthGauge from "@/components/HealthGauge";
-import RadarChart from "@/components/RadarChart";
-import AdditiveCard from "@/components/AdditiveCard";
-import { Activity, ShieldAlert, FileText, CheckCircle, Clock } from "lucide-react";
+import { Activity, FileText } from "lucide-react";
 import Link from "next/link";
 
 import { useAuth } from "@/components/AuthProvider";
